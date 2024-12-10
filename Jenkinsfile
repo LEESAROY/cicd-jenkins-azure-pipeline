@@ -7,21 +7,27 @@ pipeline {
     }
 
     stages {
-        stage('Setup') {
+        stage('Install Chocolatey') {
             steps {
                 script {
-                    echo 'Installing dependencies...'
+                    echo 'Installing Chocolatey...'
                     bat '''
                         @echo off
-                        SETLOCAL
-
                         REM Install Chocolatey if not already installed
-                        choco -v
-                        if %ERRORLEVEL% NEQ 0 (
-                            powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
-                        )
+                        powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
+                        REM Ensure Chocolatey commands are on the path
+                        set PATH=%PATH%;C:\\ProgramData\\chocolatey\\bin
+                    '''
+                }
+            }
+        }
 
-                        REM Install zip
+        stage('Install zip') {
+            steps {
+                script {
+                    echo 'Installing zip...'
+                    bat '''
+                        @echo off
                         choco install zip -y
                     '''
                 }
