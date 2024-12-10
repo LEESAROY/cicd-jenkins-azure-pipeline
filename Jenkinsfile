@@ -12,6 +12,16 @@ pipeline {
                 script {
                     echo 'Installing dependencies...'
                     bat '''
+                        @echo off
+                        SETLOCAL
+
+                        REM Install Chocolatey if not already installed
+                        choco -v
+                        if %ERRORLEVEL% NEQ 0 (
+                            powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
+                        )
+
+                        REM Install zip
                         choco install zip -y
                     '''
                 }
@@ -22,7 +32,7 @@ pipeline {
             steps {
                 script {
                     echo 'Building the application...'
-                    sh 'npm install'
+                    bat 'npm install'
                 }
             }
         }
@@ -31,7 +41,7 @@ pipeline {
             steps {
                 script {
                     echo 'Running tests...'
-                    sh 'npm test'
+                    bat 'npm test'
                 }
             }
         }
@@ -45,10 +55,10 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying to Azure...'
-                    sh '''
-                        az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID}
+                    bat '''
+                        az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% --tenant %AZURE_TENANT_ID%
                         zip -r function.zip .
-                        az functionapp deployment source config-zip --resource-group ${RESOURCE_GROUP} --name ${FUNCTION_APP_NAME} --src function.zip
+                        az functionapp deployment source config-zip --resource-group %RESOURCE_GROUP% --name %FUNCTION_APP_NAME% --src function.zip
                     '''
                 }
             }
@@ -58,7 +68,7 @@ pipeline {
             steps {
                 script {
                     echo 'Cleaning up...'
-                    sh 'rm -f function.zip'
+                    bat 'del function.zip'
                 }
             }
         }
