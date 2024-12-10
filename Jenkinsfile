@@ -7,6 +7,33 @@ pipeline {
     }
 
     stages {
+        stage('Setup') {
+            steps {
+                script {
+                    echo 'Installing dependencies...'
+                    sh '''
+                        if [ "$(uname)" = "Linux" ]; then
+                            # Linux
+                            if ! command -v zip &> /dev/null; then
+                                sudo apt-get update
+                                sudo apt-get install -y zip
+                            fi
+                        elif [ "$(uname)" = "Darwin" ]; then
+                            # macOS
+                            if ! command -v zip &> /dev/null; then
+                                brew install zip
+                            fi
+                        elif [ "$(uname -o)" = "Msys" ]; then
+                            # Windows with Git Bash
+                            if ! command -v zip &> /dev/null; then
+                                choco install zip -y
+                            fi
+                        fi
+                    '''
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 script {
@@ -26,20 +53,19 @@ pipeline {
         }
 
         stage('Deploy') {
+            environment {
+                AZURE_CLIENT_ID = credentials('AZURE_CLIENT_ID')
+                AZURE_CLIENT_SECRET = credentials('AZURE_CLIENT_SECRET')
+                AZURE_TENANT_ID = credentials('AZURE_TENANT_ID')
+            }
             steps {
                 script {
-                    withCredentials([
-                        string(credentialsId: 'AZURE_CLIENT_ID', variable: 'AZURE_CLIENT_ID'),
-                        string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
-                        string(credentialsId: 'AZURE_TENANT_ID', variable: 'AZURE_TENANT_ID')
-                    ]) {
-                        echo 'Deploying to Azure...'
-                        sh """
-                            az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-                            zip -r function.zip .
-                            az functionapp deployment source config-zip --resource-group $RESOURCE_GROUP --name $FUNCTION_APP_NAME --src function.zip
-                        """
-                    }
+                    echo 'Deploying to Azure...'
+                    sh '''
+                        az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID}
+                        zip -r function.zip .
+                        az functionapp deployment source config-zip --resource-group ${RESOURCE_GROUP} --name ${FUNCTION_APP_NAME} --src function.zip
+                    '''
                 }
             }
         }
