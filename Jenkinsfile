@@ -11,24 +11,8 @@ pipeline {
             steps {
                 script {
                     echo 'Installing dependencies...'
-                    sh '''
-                        if [ "$(uname)" = "Linux" ]; then
-                            # Linux
-                            if ! command -v zip &> /dev/null; then
-                                sudo apt-get update
-                                sudo apt-get install -y zip
-                            fi
-                        elif [ "$(uname)" = "Darwin" ]; then
-                            # macOS
-                            if ! command -v zip &> /dev/null; then
-                                brew install zip
-                            fi
-                        elif [ "$(uname -o)" = "Msys" ]; then
-                            # Windows with Git Bash
-                            if ! command -v zip &> /dev/null; then
-                                choco install zip -y
-                            fi
-                        fi
+                    bat '''
+                        choco install zip -y
                     '''
                 }
             }
