@@ -7,15 +7,26 @@ pipeline {
     }
 
     stages {
+        stage('Clean Chocolatey Installation') {
+            steps {
+                script {
+                    echo 'Cleaning existing Chocolatey installation...'
+                    bat '''
+                        IF EXIST "C:\\ProgramData\\chocolatey" (
+                            rmdir /S /Q "C:\\ProgramData\\chocolatey"
+                        )
+                    '''
+                }
+            }
+        }
+
         stage('Install Chocolatey') {
             steps {
                 script {
                     echo 'Installing Chocolatey...'
                     bat '''
                         @echo off
-                        REM Install Chocolatey if not already installed
                         powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
-                        REM Ensure Chocolatey commands are on the path
                         set PATH=%PATH%;C:\\ProgramData\\chocolatey\\bin
                     '''
                 }
