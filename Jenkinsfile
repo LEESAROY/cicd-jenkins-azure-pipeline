@@ -75,7 +75,9 @@ pipeline {
                     echo 'Deploying to Azure...'
                     bat '''
                         az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% --tenant %AZURE_TENANT_ID%
+                        dir
                         zip -r function.zip .
+                        dir
                         az functionapp deployment source config-zip --resource-group %RESOURCE_GROUP% --name %FUNCTION_APP_NAME% --src function.zip
                     '''
                 }
