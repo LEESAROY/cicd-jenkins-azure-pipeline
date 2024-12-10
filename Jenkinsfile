@@ -40,5 +40,26 @@ pipeline {
                 }
             }
         }
+
+        stage('Cleanup') {
+            steps {
+                script {
+                    echo 'Cleaning up...'
+                    sh 'rm -f function.zip'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
     }
 }

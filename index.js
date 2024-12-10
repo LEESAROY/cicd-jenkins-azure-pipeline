@@ -1,6 +1,8 @@
 module.exports = async function (context, req) {
-    context.res = {
-        status: 200,
-        body: "Hello, World!"
-    };
+    console.log('Handler invoked');
+    context.res.statusCode = 200;
+    context.res.setHeader('Content-Type', 'text/plain');
+    context.res.write("Hello, World!");
+    console.log('Response set');
+    context.res.end();
 };
