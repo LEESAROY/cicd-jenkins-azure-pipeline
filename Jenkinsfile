@@ -27,7 +27,7 @@ pipeline {
                     bat '''
                         @echo off
                         powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
-                        set PATH=%PATH%;C:\\ProgramData\\chocolatey\\bin
+                        setx PATH "%PATH%;C:\\ProgramData\\chocolatey\\bin"
                     '''
                 }
             }
@@ -39,6 +39,7 @@ pipeline {
                     echo 'Installing zip...'
                     bat '''
                         @echo off
+                        set PATH=%PATH%;C:\\ProgramData\\chocolatey\\bin
                         choco install zip -y
                     '''
                 }
