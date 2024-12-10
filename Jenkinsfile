@@ -64,7 +64,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Azure Login') {
             environment {
                 AZURE_CLIENT_ID = credentials('AZURE_CLIENT_ID')
                 AZURE_CLIENT_SECRET = credentials('AZURE_CLIENT_SECRET')
@@ -72,12 +72,32 @@ pipeline {
             }
             steps {
                 script {
+                    echo 'Logging in to Azure...'
+                    bat '''
+                        az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% --tenant %AZURE_TENANT_ID%
+                    '''
+                }
+            }
+        }
+
+        stage('Create Deployment Package') {
+            steps {
+                script {
+                    echo 'Creating deployment package...'
+                    bat '''
+                        dir
+                        zip -r function.zip .
+                        dir
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Azure') {
+            steps {
+                script {
                     echo 'Deploying to Azure...'
                     bat '''
-                        az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% --tenant %AZURE_TENANT_ID% && ^
-                        dir && ^
-                        zip -r function.zip . && ^
-                        dir && ^
                         az functionapp deployment source config-zip --resource-group %RESOURCE_GROUP% --name %FUNCTION_APP_NAME% --src function.zip
                     '''
                 }
