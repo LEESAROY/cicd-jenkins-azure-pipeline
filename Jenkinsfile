@@ -85,7 +85,10 @@ pipeline {
                 script {
                     echo 'Creating deployment package...'
                     bat '''
-                        zip -r function.zip index.js function.json host.json package.json node_modules
+                        mkdir myFunction
+                        move index.js myFunction/
+                        move function.json myFunction/
+                        zip -r function.zip . -x *.zip
                         dir
                     '''
                 }
