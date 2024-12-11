@@ -1,6 +1,6 @@
 const request = require('supertest');
 const { createServer } = require('http');
-const handler = require('./myFunction/index');
+const handler = require('./index');
 
 function createApp() {
     return createServer((req, res) => {
