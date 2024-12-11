@@ -4,8 +4,19 @@ const handler = require('./index');
 
 function createApp() {
     return createServer((req, res) => {
-        const context = { res };
-        handler(context, req);
+        const context = { res: {} };
+
+        handler(context, req).then(() => {
+            res.statusCode = context.res.status;
+            for (const [key, value] of Object.entries(context.res.headers)) {
+                res.setHeader(key, value);
+            }
+            res.end(context.res.body);
+        }).catch((err) => {
+            console.error('Error in handler:', err);
+            res.statusCode = 500;
+            res.end('Internal Server Error');
+        });
     });
 }
 
@@ -17,6 +28,7 @@ describe('GET /', () => {
             request(server)
                 .get('/')
                 .expect(200)
+                .expect('Content-Type', /text\/plain/)
                 .expect('Hello, World!')
                 .end((err, res) => {
                     server.close(() => {
