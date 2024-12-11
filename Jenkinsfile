@@ -6,6 +6,7 @@ pipeline {
         FUNCTION_APP_NAME = 'node-leesa-9019432'
     }
 //trigger
+
     triggers {
         githubPush()
     }
