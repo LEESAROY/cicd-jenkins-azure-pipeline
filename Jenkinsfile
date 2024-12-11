@@ -6,6 +6,10 @@ pipeline {
         FUNCTION_APP_NAME = 'node-leesa-9019432'
     }
 
+    triggers {
+        githubPush()
+    }
+
     stages {
         stage('Clean Chocolatey Installation') {
             steps {
