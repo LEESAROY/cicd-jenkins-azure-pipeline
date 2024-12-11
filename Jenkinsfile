@@ -86,9 +86,9 @@ pipeline {
                     echo 'Creating deployment package...'
                     bat '''
                         mkdir myFunction
-                        copy index.js myFunction/
-                        copy function.json myFunction/
-                        zip -r function.zip . -x *.zip
+                        copy index.js myFunction\\index.js
+                        copy function.json myFunction\\function.json
+                        powershell Compress-Archive -Path * -DestinationPath function.zip -Force
                         dir
                     '''
                 }
