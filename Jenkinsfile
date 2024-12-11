@@ -5,8 +5,6 @@ pipeline {
         RESOURCE_GROUP = 'cicd-jenkins'
         FUNCTION_APP_NAME = 'node-leesa-9019432'
     }
-    
-// trigger added 
 
     triggers {
         githubPush()
